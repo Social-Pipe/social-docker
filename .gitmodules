@@ -1,0 +1,3 @@
+[submodule "reactapp"]
+	path = reactapp
+	url = git@github.com:Social-Pipe/social-frontend.git
