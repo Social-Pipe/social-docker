@@ -1,0 +1,40 @@
+version: "3"
+services:
+  reactapp:
+    container_name: django_react_reactapp
+    restart: always
+    build: reactapp
+    ports:
+      - "${REACT_APP_PORT}:3000"
+    volumes:
+      - /home/node/app/node_modules
+      - ./reactapp:/home/node/app
+    links:
+      - djangoapp
+  db:
+    container_name: django_react_db
+    restart: always
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "${POSTGRES_PORT}:5432"
+  djangoapp:
+    container_name: django_react_djangoapp
+    restart: always
+    build:
+      context: djangoapp
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./djangoapp:/usr/src/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=app.settings
+    ports:
+      - "${DJANGO_APP_PORT}:8000"
+    command: python app/manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db

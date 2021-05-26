@@ -1,0 +1,17 @@
+version: "3"
+services:
+  djangoapp:
+    build: djangoapp
+    restart: always
+    ports:
+      - "${DJANGO_APP_PORT}:8000"
+    volumes:
+      - .:/code
+    command: gunicorn app.wsgi:application -w 2 --bind 0.0.0.0:8000 --chdir /code/app --reload
+  nginx:
+    restart: always
+    build: .
+    ports:
+      - "${APP_PORT}:80"
+    depends_on:
+      - djangoapp
