@@ -12,6 +12,12 @@ git submodules update
 cd reactpapp && git pull origin develop
 ```
 
+### Utilizando variáveis de ambiente
+
+```sh
+cp .env.example .env
+```
+
 ###  Inicializando migrações
 ```sh
 docker exec -it django_react_djangoapp bash -c "cd /usr/src/app/app && python manage.py makemigrations"

@@ -7,7 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from app.core.permissions import IsAdminOrIsSelf
-from app.core.serializers import UserSerializer, CreateUserSerializer, GroupSerializer
+from app.core.models import Address, Payment
+from app.core.serializers import UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
 
 User = get_user_model()
@@ -29,7 +30,8 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = CreateUserSerializer(user, many=False)
             return Response(serializer.data)
         except IntegrityError:
-            raise UniqueEmail(detail=f"email {request.data['email']} already exists")
+            raise UniqueEmail(
+                detail=f"email {request.data['email']} already exists")
 
     def get_permissions(self):
         """
@@ -62,12 +64,19 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-# @api_view(['GET'])
-# @permission_classes([permissions.IsAuthenticated])
-# def user_logged_in(request, format=None):
-#     print(request)
-#     content = {
-#         'user': str(request.user),  # `django.contrib.auth.User` instance.
-#         'auth': str(request.auth),  # None
-#     }
-#     return Response(content)
+class AddressViewSet(viewsets.ModelViewSet):
+    """
+    Address model is a Payment child. It stores an address payment data from an user.
+    """
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    """
+    Payment payment data from an user.
+    """
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [permissions.AllowAny]

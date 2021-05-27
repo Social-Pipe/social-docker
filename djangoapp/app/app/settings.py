@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'djangoapp',
     'localhost',
+    'localhost:3000',
 ]
 
 AUTH_USER_MODEL = 'core.User'
@@ -49,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_yasg',
     'app.core',
-    'app.posts',
     'corsheaders',
 ]
 
