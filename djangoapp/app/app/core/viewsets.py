@@ -7,7 +7,8 @@ from rest_framework.response import Response
 
 from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
-from app.core.serializers import SimplifiedUserSerializer, UserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
+from app.clients.models import Client
+from app.core.serializers import SimplifiedUserSerializer, UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
 
 from pprint import pprint
@@ -25,20 +26,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
-            pprint(request.data)
             user = User(**request.data)
             user.set_password(request.data.get('password', None))
-            payment = request.data['payment']
-            address = payment['address']
-            payment = Payment(**payment)
-            address = Address(**address)
+            payment_data = request.data['payment']
+            client_data = request.data['client']
+            address_data = payment_data['address']
+            payment = Payment(**payment_data)
+            address = Address(**address_data)
+            client = Client(**client_data)
             user.save()
+            client.user = user
+            client.save()
             payment.user = user
             payment.save()
             address.payment = payment
             address.save()
-            pprint(user.__dict__)
-            serializer = UserSerializer(user, many=False)
+            serializer = UserSerializer(user, many=False, context={'request': request})
             return Response(serializer.data)
         except IntegrityError:
             raise UniqueEmail(
@@ -72,6 +75,8 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         if self.action == 'list' or self.action == 'retrieve':
             return SimplifiedUserSerializer
+        if self.action == 'create':
+            return CreateUserSerializer
         else:
             return UserSerializer
 

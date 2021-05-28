@@ -5,11 +5,11 @@ class ClientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Client
         fields = ['id', 'url', 'logo', 'name', 'access_hash',
-                  'instagram', 'facebook', 'linkedin', 'user']
+                  'instagram', 'facebook', 'linkedin']
 
 
 class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Client
         fields = ['id', 'url', 'logo', 'name',
-                  'instagram', 'facebook', 'linkedin', 'user']
+                  'instagram', 'facebook', 'linkedin']
