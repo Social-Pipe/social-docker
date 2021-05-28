@@ -1,7 +1,7 @@
 version: "3"
 services:
   reactapp:
-    container_name: django_react_reactapp
+    container_name: postbaker_reactapp
     restart: always
     build: reactapp
     ports:
@@ -12,7 +12,7 @@ services:
     links:
       - djangoapp
   db:
-    container_name: django_react_db
+    container_name: postbaker_db
     restart: always
     image: postgres
     volumes:
@@ -24,7 +24,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
   djangoapp:
-    container_name: django_react_djangoapp
+    container_name: postbaker_djangoapp
     restart: always
     build:
       context: djangoapp

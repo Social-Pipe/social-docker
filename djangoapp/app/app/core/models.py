@@ -66,15 +66,13 @@ class Address(models.Model):
     number = models.CharField(max_length=64)
     city = models.CharField(max_length=128)
     state_uf = models.CharField(max_length=2)
-    neighborhood = models.CharField(max_length=2)
+    neighborhood = models.CharField(max_length=128)
     payment = models.ForeignKey(
         'Payment', on_delete=models.CASCADE, blank=True, null=True)
 
 
 # https://docs.pagar.me/docs/realizando-uma-transacao-de-cartao-de-credito#criando-um-cart%C3%A3o-para-one-click-buy
 class Payment(models.Model):
-    address = models.ForeignKey(
-        'Address', on_delete=models.CASCADE, blank=True, null=True)
     card_id = models.CharField(max_length=64)
     user = models.ForeignKey(
         'User', on_delete=models.CASCADE, blank=True, null=True)

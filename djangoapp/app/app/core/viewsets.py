@@ -8,8 +8,10 @@ from rest_framework.response import Response
 
 from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
-from app.core.serializers import UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
+from app.core.serializers import SimplifiedUserSerializer, UserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
+
+from pprint import pprint
 
 User = get_user_model()
 
@@ -19,19 +21,56 @@ class UserViewSet(viewsets.ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
     queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
+    serializer_class = SimplifiedUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request):
         try:
+            pprint(request.data)
             user = User(**request.data)
             user.set_password(request.data.get('password', None))
+            payment = request.data['payment']
+            address = payment['address']
+            payment = Payment(**payment)
+            address = Address(**address)
             user.save()
-            serializer = CreateUserSerializer(user, many=False)
+            payment.user = user
+            payment.save()
+            address.payment = payment
+            address.save()
+            pprint(user.__dict__)
+            serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
         except IntegrityError:
             raise UniqueEmail(
                 detail=f"email {request.data['email']} already exists")
+
+    def retrieve(self, request, *args, **kwargs):
+        print('args')
+        print(args)
+        print('kwargs')
+        user_id = kwargs.get('pk', None)
+        user = User.objects.get(pk=user_id)
+        print(user)
+        payment = Payment.objects.filter(user=user).first()
+        print(payment)
+        address = Address.objects.filter(payment=payment).first()
+        payment.address = address
+        user.payment = payment
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data)
+
+    @action(methods=["get"], detail=True, url_path="clients", url_name="clients")
+    def get_clients(self, request, *args, **kwargs):
+        return self.retrive(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.action == 'get_clients':
+            queryset = self.queryset
+
+        return queryset
 
     def get_permissions(self):
         """
@@ -49,8 +88,8 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of serializers that this view requires.
         """
-        if self.action == 'create':
-            return CreateUserSerializer
+        if self.action == 'list' or self.action == 'retrieve':
+            return SimplifiedUserSerializer
         else:
             return UserSerializer
 
