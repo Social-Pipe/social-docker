@@ -3,7 +3,6 @@ from django.contrib.auth.models import Group
 from django.db import IntegrityError
 
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from app.core.permissions import IsAdminOrIsSelf
@@ -46,31 +45,14 @@ class UserViewSet(viewsets.ModelViewSet):
                 detail=f"email {request.data['email']} already exists")
 
     def retrieve(self, request, *args, **kwargs):
-        print('args')
-        print(args)
-        print('kwargs')
         user_id = kwargs.get('pk', None)
         user = User.objects.get(pk=user_id)
-        print(user)
         payment = Payment.objects.filter(user=user).first()
-        print(payment)
         address = Address.objects.filter(payment=payment).first()
         payment.address = address
         user.payment = payment
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data)
-
-    @action(methods=["get"], detail=True, url_path="clients", url_name="clients")
-    def get_clients(self, request, *args, **kwargs):
-        return self.retrive(request, *args, **kwargs)
-
-    def get_queryset(self):
-        queryset = self.queryset
-
-        if self.action == 'get_clients':
-            queryset = self.queryset
-
-        return queryset
 
     def get_permissions(self):
         """
