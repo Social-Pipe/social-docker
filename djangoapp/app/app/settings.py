@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'djangoapp',
     'localhost',
+    'localhost:3000',
 ]
 
 AUTH_USER_MODEL = 'core.User'
@@ -49,7 +50,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_yasg',
     'app.core',
-    'app.posts',
+    'app.clients',
     'corsheaders',
 ]
 
@@ -145,8 +146,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
 }
 
 SWAGGER_SETTINGS = {

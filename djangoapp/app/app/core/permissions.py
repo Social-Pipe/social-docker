@@ -12,7 +12,7 @@ class IsAdminOrIsSelf(permissions.BasePermission):
         loggedin_id = request.user.id
         is_admin = request.user.is_admin
 
-        if(loggedin_id == request_id):
+        if(loggedin_id == int(request_id)):
             return True
         elif is_admin:
             return True

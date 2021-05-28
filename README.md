@@ -12,15 +12,21 @@ git submodules update
 cd reactpapp && git pull origin develop
 ```
 
+### Utilizando variáveis de ambiente
+
+```sh
+cp .env.example .env
+```
+
 ###  Inicializando migrações
 ```sh
-docker exec -it django_react_djangoapp bash -c "cd /usr/src/app/app && python manage.py makemigrations"
-docker exec -it django_react_djangoapp bash -c "cd /usr/src/app/app && python manage.py migrate"
+docker exec -it postbaker_djangoapp bash -c "cd /usr/src/app/app && python manage.py makemigrations"
+docker exec -it postbaker_djangoapp bash -c "cd /usr/src/app/app && python manage.py migrate"
 ```
 
 ### Criando superusuário Django
 ```sh
-docker exec -it django_react_djangoapp bash -c "cd /usr/src/app/app && python manage.py createsuperuser"
+docker exec -it postbaker_djangoapp bash -c "cd /usr/src/app/app && python manage.py createsuperuser"
 ```
 
 ### Deploy para produção

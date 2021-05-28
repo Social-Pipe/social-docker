@@ -9,15 +9,17 @@ from django.utils.translation import ugettext_lazy as _
 from .managers import UserManager
 
 # https://docs.djangoproject.com/en/3.2/topics/auth/customizing/#specifying-a-custom-user-model
+
+
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name='email address',max_length=255,unique=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    date_of_birth = models.DateField(blank=True, null=True)
+    email = models.EmailField(
+        verbose_name='email address', max_length=255, unique=True)
+    name = models.CharField(max_length=120, blank=True)
+    cpf = models.CharField(max_length=11, blank=True)
+    phone = models.CharField(max_length=11, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
     objects = UserManager()
 
@@ -36,14 +38,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         Returns the first_name plus the last_name, with a space in between.
         '''
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = self.name
         return full_name.strip()
 
     def get_short_name(self):
         '''
         Returns the short name for the user.
         '''
-        return self.first_name
+        return self.name.split(',')[0]
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         '''
@@ -56,3 +58,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+
+class Address(models.Model):
+    cep = models.CharField(max_length=9)
+    street = models.CharField(max_length=258)
+    number = models.CharField(max_length=64)
+    city = models.CharField(max_length=128)
+    state_uf = models.CharField(max_length=2)
+    neighborhood = models.CharField(max_length=128)
+    payment = models.ForeignKey(
+        'Payment', on_delete=models.CASCADE, blank=True, null=True)
+
+
+# https://docs.pagar.me/docs/realizando-uma-transacao-de-cartao-de-credito#criando-um-cart%C3%A3o-para-one-click-buy
+class Payment(models.Model):
+    card_id = models.CharField(max_length=64)
+    user = models.ForeignKey(
+        'User', on_delete=models.CASCADE, blank=True, null=True)
