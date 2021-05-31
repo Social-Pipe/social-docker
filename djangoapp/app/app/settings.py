@@ -35,6 +35,9 @@ ALLOWED_HOSTS = [
     'localhost:3000',
 ]
 
+# https://github.com/adamchainz/django-cors-headers#configuration
+CORS_ALLOW_ALL_ORIGINS = True
+
 AUTH_USER_MODEL = 'core.User'
 
 # Application definition
