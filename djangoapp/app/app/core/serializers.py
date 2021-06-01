@@ -38,11 +38,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
     payment = PaymentSerializer(many=False)
-    client = CreateClientSerializer(many=False)
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'name', 'cpf', 'phone', 'payment', 'client']
+        fields = ['email', 'password', 'name', 'cpf', 'phone', 'payment']
         depth = 2
 
     def create(self, validated_data):
@@ -51,7 +50,6 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
         user = self.model.objects.create(**validated_data)
         address = payment_data.pop('address')
         payment = Payment.objects.create(user=user, **payment)
-        client = Client.objects.create(user=user, **client)
         address = Address.objects.create(
             payment=payment_instance, **address)
         return user

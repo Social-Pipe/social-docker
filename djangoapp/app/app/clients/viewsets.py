@@ -1,14 +1,18 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.crypto import get_random_string
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser
 
 from app.clients.models import Client
-from app.clients.serializers import ClientSerializer
+from app.clients.serializers import ClientSerializer, CreateClientSerializer
 
+import json
 from pprint import pprint
 
 User = get_user_model()
@@ -21,20 +25,33 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
 
     @action(methods=["get"], detail=True, url_path="posts", url_name="posts")
     def get_posts(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
     def create(self, request):
-        pprint(request.data)
+        logo = request.data['logo']
         client = Client(**request.data)
+        client.name = request.data['name']
+        client.facebook = json.loads(request.data['facebook'])
+        client.instagram = json.loads(request.data['instagram'])
+        client.linkedin = json.loads(request.data['linkedin'])
+        client.logo = default_storage.save(
+            f"client/logo/{logo.name}", ContentFile(logo.read()))
         client.password = make_password(request.data.get('password', None))
         client.access_hash = get_random_string(length=16)
         user = User.objects.get(pk=request.user.id)
         client.user = user
         client.save()
-        serializer = ClientSerializer(client, many=False, context={'request': request})
+        # 
+        # 
+        # Realizar pagamento junto à pagarme
+        # 
+        # 
+        serializer = ClientSerializer(
+            client, many=False, context={'request': request})
         return Response(serializer.data)
 
     def get_queryset(self):

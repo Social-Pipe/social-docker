@@ -1,13 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import IntegrityError
+from django.utils.crypto import get_random_string
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
 from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
-from app.clients.models import Client
 from app.core.serializers import SimplifiedUserSerializer, UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
 
@@ -29,23 +29,20 @@ class UserViewSet(viewsets.ModelViewSet):
             user = User(**request.data)
             user.set_password(request.data.get('password', None))
             payment_data = request.data['payment']
-            client_data = request.data['client']
             address_data = payment_data['address']
             payment = Payment(**payment_data)
             address = Address(**address_data)
-            client = Client(**client_data)
             user.save()
-            client.user = user
-            client.save()
             payment.user = user
             payment.save()
             address.payment = payment
             address.save()
-            serializer = UserSerializer(user, many=False, context={'request': request})
+            serializer = UserSerializer(
+                user, many=False, context={'request': request})
             return Response(serializer.data)
-        except IntegrityError:
+        except IntegrityError as e:
             raise UniqueEmail(
-                detail=f"email {request.data['email']} already exists")
+                detail=f"email {request.data['email']} already exists, {e}")
 
     def retrieve(self, request, *args, **kwargs):
         user_id = kwargs.get('pk', None)
