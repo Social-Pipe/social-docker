@@ -7,8 +7,8 @@ Boilerplate de aplicação React-Django rodando em containers docker
 O app React está como `submodules` do git. Para poder verificar novas atualizações no repositório próprio dele use:
 
 ```sh
-git submodules init
-git submodules update
+git submodule init
+git submodule update
 cd reactpapp && git pull origin develop
 ```
 

@@ -2,7 +2,7 @@ FROM node:14.14.0 as build_stage
 
 WORKDIR /app
 COPY reactapp/package.json .
-COPY reactapp/.env.docker .env
+COPY reactapp/.env.production .env
 RUN yarn
 COPY reactapp .
 RUN yarn build
