@@ -13,3 +13,4 @@ class Client(models.Model):
     linkedin = models.BooleanField(default=False)
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+
