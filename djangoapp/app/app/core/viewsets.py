@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.utils.crypto import get_random_string
+from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
@@ -43,6 +44,39 @@ class UserViewSet(viewsets.ModelViewSet):
         except IntegrityError as e:
             raise UniqueEmail(
                 detail=f"email {request.data['email']} already exists, {e}")
+
+    def partial_update(self, request, pk):
+        try:
+            print('-===============================-')
+            if 'password' in request.data:
+                user.set_password(request.data.get('password', None))
+            if 'payment' in request.data:
+                payment_data = request.data['payment']
+                request.data.pop('payment')
+                if 'address' in payment_data:
+                    address_data = payment_data['address']
+                    payment = Payment.objects.get(user_id=pk)
+                    Address.objects.filter(payment_id=payment.id).update(**address_data)
+                    payment_data.pop('address')
+                Payment.objects.filter(user_id=pk).update(**payment_data)
+            # Email não é editável
+            if 'email' in request.data:
+                request.data.pop('email')
+            User.objects.filter(pk=pk).update(**request.data)
+            user = get_object_or_404(User, pk=pk)
+            payment = Payment.objects.get(user_id=pk)
+            user.payment = payment 
+            address = Address.objects.get(payment_id=payment.id)
+            user.payment.address = address
+            serializer = UserSerializer(
+                user, many=False, context={'request': request})
+            return Response(serializer.data)
+        except IntegrityError as e:
+            raise UniqueEmail(
+                detail=f"IntegrityError: {e}")
+
+    def update(self, request, *args, **kwargs):
+        return self.partial_update(self, request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         user_id = kwargs.get('pk', None)

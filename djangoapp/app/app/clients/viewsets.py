@@ -54,15 +54,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             client, many=False, context={'request': request})
         return Response(serializer.data)
 
-    def list(self, request):
-        clients =  Client.objects.all()
-        for client in clients:
-            print(client.logo)
-        serializer = ClientSerializer(
-            clients, many=True, context={'request': request})
-        print(serializer.data)
-        return Response(serializer.data)
-
     def get_queryset(self):
         queryset = self.queryset
 
