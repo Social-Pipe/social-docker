@@ -47,7 +47,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, pk):
         try:
-            print('-===============================-')
             if 'password' in request.data:
                 user.set_password(request.data.get('password', None))
             if 'payment' in request.data:

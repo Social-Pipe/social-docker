@@ -26,6 +26,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
+    lookup_field = 'access_hash'
 
     @action(methods=["get"], detail=True, url_path="posts", url_name="posts")
     def get_posts(self, request, *args, **kwargs):
