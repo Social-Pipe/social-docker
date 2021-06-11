@@ -37,7 +37,7 @@ class Post(models.Model):
     caption = models.TextField()
     posting_date = models.DateTimeField()
     publish = models.BooleanField(default=False)
-    type = models.CharField(max_length=9, choices=STATUS_CHOICES, blank=False, null=False, default="NONE")
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, blank=False, null=False, default="NONE")
     client  = models.ForeignKey(
         'Client', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

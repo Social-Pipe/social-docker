@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -9,8 +9,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser
 
-from app.clients.models import Client
-from app.clients.serializers import ClientSerializer, CreateClientSerializer
+from app.clients.models import Client, Post, PostFile, Comment
+from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, PostFileSerializer, CommentSerializer
+from app.clients.permissions import IsAuthenticatedOrIsClient
 
 import json
 from pprint import pprint
@@ -73,3 +74,31 @@ class ClientViewSet(viewsets.ModelViewSet):
             return CreateClientSerializer
         else:
             return ClientSerializer
+
+class Post(viewsets.ModelViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    '''
+    ?facebook=true&...
+    '''
+
+class PostFile(viewsets.ModelViewSet):
+    queryset = PostFile.objects.all()
+    serializer_class = PostFileSerializer
+    permission_classes = [IsAuthenticatedOrIsClient]
+
+class Comment(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrIsClient]
+
+'''
+/client-token
+hash
+password
+isAuthenticatedOrIsClient
+verificar se tem reques.user, senão verifica por outro token e se tem scope client no payload e sub (subject) o hash do cliente
+se não, False
+'''
