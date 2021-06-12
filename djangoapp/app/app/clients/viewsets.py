@@ -3,14 +3,15 @@ from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser
+from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser, CamelCaseJSONParser
 
 from app.clients.models import Client, Post, PostFile, Comment
-from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, PostFileSerializer, CommentSerializer
+from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer
 from app.clients.permissions import IsAuthenticatedOrIsClient
 
 import json
@@ -25,13 +26,34 @@ class ClientViewSet(viewsets.ModelViewSet):
     """
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
+    # permission_classes = [permissions.IsAuthenticated]
+    # parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
     lookup_field = 'access_hash'
 
-    @action(methods=["get"], detail=True, url_path="posts", url_name="posts")
-    def get_posts(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    @action(methods=["get", "post"], detail=True, url_path="posts", name="client_posts")
+    def client_posts(self, request, *args, **kwargs):
+        pprint(self.parser_classes)
+        pprint(self.permission_classes)
+        print(args)
+        print(request.method)
+        print(kwargs)
+        if hasattr(request, 'client'):
+            client = request.client
+        else:
+            client = get_object_or_404(Client, access_hash=kwargs.get('access_hash', None))
+        if request.method == 'GET':
+            print(client)
+            posts = Post.objects.filter(client=client)
+            serializer = PostSerializer(
+                posts, many=True, context={'request': request})
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            post = Post(**request.data)
+            post.client = client
+            post.save()            
+            serializer = CreatePostSerializer(
+                post, many=False, context={'request': request})
+            return Response(serializer.data)
 
     def create(self, request):
         logo = request.data['logo']
@@ -47,24 +69,30 @@ class ClientViewSet(viewsets.ModelViewSet):
         user = User.objects.get(pk=request.user.id)
         client.user = user
         client.save()
-        # 
-        # 
+        #
+        #
         # Realizar pagamento junto à pagarme
-        # 
-        # 
+        #
+        #
         serializer = ClientSerializer(
             client, many=False, context={'request': request})
         return Response(serializer.data)
 
     def get_queryset(self):
         queryset = self.queryset
-
         if self.action == 'get_posts':
-            queryset = self.queryset
+            queryset = Post.objects.all()
         elif self.action == 'list':
             queryset = Client.objects.filter(user=self.request.user).all()
 
         return queryset
+
+    def get_parsers(self):
+        if self.action_map['get'] == 'client_posts':
+            parser_classes = [CamelCaseJSONParser]
+        else:
+            parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
+        return [parser_class() for parser_class in parser_classes]
 
     def get_serializer_class(self):
         """
@@ -72,27 +100,38 @@ class ClientViewSet(viewsets.ModelViewSet):
         """
         if self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
             return CreateClientSerializer
+        elif self.action == 'client_posts' and self.request.method == 'POST':
+            return CreatePostSerializer
+        elif self.action == 'client_posts' and self.request.method == 'GET':
+            return PostSerializer
         else:
             return ClientSerializer
 
-class Post(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action == 'client_posts' and self.request.method == 'GET':
+            permission_classes = [IsAuthenticatedOrIsClient]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+
+class PostViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    '''
-    ?facebook=true&...
-    '''
 
-class PostFile(viewsets.ModelViewSet):
+class PostFileViewSet(viewsets.ModelViewSet):
     queryset = PostFile.objects.all()
     serializer_class = PostFileSerializer
     permission_classes = [IsAuthenticatedOrIsClient]
 
-class Comment(viewsets.ModelViewSet):
+
+class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrIsClient]
+
 
 '''
 /client-token

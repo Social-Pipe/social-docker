@@ -16,6 +16,9 @@ class Client(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.name}@{self.access_hash}"
+
 class Post(models.Model):
     TYPE_CHOICES = (
         ("SINGLE", "Única Imagem"),
@@ -49,7 +52,7 @@ class Post(models.Model):
 class PostFile(models.Model):
     file = models.ImageField(upload_to='client/files/', null=True, blank=True)
     post  = models.ForeignKey(
-        'Post', on_delete=models.CASCADE, blank=True, null=True)
+        'Post', related_name='files', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Comment(models.Model):
@@ -61,6 +64,6 @@ class Comment(models.Model):
     writer = models.CharField(max_length=6, choices=WRITER_CHOICES, blank=False, null=False)
     message = models.TextField()
     post  = models.ForeignKey(
-        'Post', on_delete=models.CASCADE, blank=True, null=True)
+        'Post', related_name='comments', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

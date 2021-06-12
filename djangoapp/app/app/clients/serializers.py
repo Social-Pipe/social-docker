@@ -15,31 +15,39 @@ class ClientSerializer(serializers.HyperlinkedModelSerializer):
 class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Client
-        fields = ['id', 'url', 'logo', 'name', 'password', 
+        fields = ['id', 'url', 'logo', 'name', 'password',
                   'instagram', 'facebook', 'linkedin']
 
 
-class PostFileSerializer(serializers.HyperlinkedModelSerializer):
+class PostFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostFile
         fields = ['id', 'file', 'created_at']
         depth = 1
 
 
-class PostSerializer(serializers.HyperlinkedModelSerializer):
-    files = PostFileSerializer(many=True)
-
+class CreatePostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'files', 'caption',
-                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status']
-        depth = 2
+        fields = ['caption',
+                  'instagram', 'facebook', 'linkedin', 'posting_date', 'publish', 'type', 'status']
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'writer', 'message', 'created_at']
+
+
+class PostSerializer(serializers.ModelSerializer):
+    files = PostFileSerializer(many=True)
+    comments = CommentSerializer(many=True)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'files', 'caption',
+                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status', 'comments']
+        depth = 2
 
 
 class ClientObtainTokenSerializer(serializers.Serializer):

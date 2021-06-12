@@ -166,6 +166,12 @@ SWAGGER_SETTINGS = {
             'description': 'API JWT accessToken',
             'name': 'Authorization',
             'in': 'header'
+        },
+        'X-Client': {
+            'type': 'apiKey',
+            'description': 'Client JWT accessToken',
+            'name': 'X-Client',
+            'in': 'header'
         }
     }
 }

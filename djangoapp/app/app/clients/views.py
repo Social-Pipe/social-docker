@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 
 from app.clients.serializers import ClientObtainTokenSerializer
 from app.clients.models import Client
@@ -25,10 +26,11 @@ class ClientToken(generics.GenericAPIView):
         # Verifica se a senha coincide
         if check_password(request.data.get('password', None), client.password):
             encoded_jwt = jwt.encode({
+                "token_type": "access",
                 "sub": client.id,
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24),
                 "scope": "client"
             }, settings.SECRET_KEY, algorithm="HS256")
             return Response({"access_token": encoded_jwt}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "Hash/Senha incorreta"}, status=status.HTTP_403_FORBIDDEN)
+            return PermissionDenied(detail="Incorrect hash/password", code=None)
