@@ -1,8 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db.models.fields import EmailField
+
+from rest_framework import serializers
+
 from app.core.models import Payment, Address
 from app.clients.models import Client
-from rest_framework import serializers
 from app.clients.serializers import CreateClientSerializer
 
 
@@ -59,3 +62,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
+
+
+class UserRecoverPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()

@@ -28,6 +28,7 @@ from rest_framework_simplejwt.views import (
 
 from .router import router
 from app.clients.views import ClientToken
+from app.core.views import RecoverPassword
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -55,6 +56,7 @@ urlpatterns = [
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/v1/token/client', ClientToken.as_view()),
+    path('api/v1/users/recover-password', RecoverPassword.as_view()),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('docs/', schema_view.with_ui('swagger',
