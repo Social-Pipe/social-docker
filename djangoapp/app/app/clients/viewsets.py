@@ -132,7 +132,7 @@ class PostFileViewSet(viewsets.ModelViewSet):
             return ClientSerializer
 
     def get_parsers(self):
-        if self.action_map['get'] == 'client_posts':
+        if self.action == 'list' or self.action == 'retrieve':
             parser_classes = [CamelCaseJSONParser]
         else:
             parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]
