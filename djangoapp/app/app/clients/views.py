@@ -33,4 +33,4 @@ class ClientToken(generics.GenericAPIView):
             }, settings.SECRET_KEY, algorithm="HS256")
             return Response({"access_token": encoded_jwt}, status=status.HTTP_200_OK)
         else:
-            return PermissionDenied(detail="Incorrect hash/password", code=None)
+            raise PermissionDenied(detail="Incorrect hash/password", code=None)
