@@ -129,10 +129,11 @@ class PostFileViewSet(viewsets.ModelViewSet):
         if self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
             return CreatePostFileSerializer
         else:
-            return ClientSerializer
+            return PostFileSerializer
 
     def get_parsers(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        print(self)
+        if hasattr(self, 'action') and (self.action == 'list' or self.action == 'retrieve'):
             parser_classes = [CamelCaseJSONParser]
         else:
             parser_classes = [CamelCaseFormParser, CamelCaseMultiPartParser]

@@ -24,13 +24,15 @@ class IsAuthenticatedOrIsClient(permissions.BasePermission):
                 return True
         
         if 'X-Client' in request.headers:
-            jwt_token = request.headers['X-Client'][7:]
-            decoded_jwt = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-            if decoded_jwt['scope'] == 'client':
-                client = Client.objects.get(id=2)
-                request._client = client
-            pprint(request.__dict__)
-            return True
+            try:
+                jwt_token = request.headers['X-Client'][7:]
+                decoded_jwt = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+                if decoded_jwt['scope'] == 'client':
+                    client = Client.objects.get(id=2)
+                    request._client = client
+                return True
+            except Exception as e:
+                print(e)
 
         if loggedin_id:
             return True
