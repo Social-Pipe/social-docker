@@ -32,6 +32,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'webmail.jogodabiblia.com',
     '162.214.108.8',
     '192.168.100.17',
     '127.0.0.1',

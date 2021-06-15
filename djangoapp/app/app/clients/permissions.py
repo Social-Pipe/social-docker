@@ -28,7 +28,7 @@ class IsAuthenticatedOrIsClient(permissions.BasePermission):
                 jwt_token = request.headers['X-Client'][7:]
                 decoded_jwt = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
                 if decoded_jwt['scope'] == 'client':
-                    client = Client.objects.get(id=2)
+                    client = Client.objects.get(id=decoded_jwt['sub'])
                     request._client = client
                 return True
             except Exception as e:
