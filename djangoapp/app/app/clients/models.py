@@ -50,7 +50,7 @@ class Post(models.Model):
         return self.caption
 
 class PostFile(models.Model):
-    file = models.ImageField(upload_to='client/files/', null=True, blank=True)
+    file = models.FileField(upload_to='client/files/', null=True, blank=True)
     post  = models.ForeignKey(
         'Post', related_name='files', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

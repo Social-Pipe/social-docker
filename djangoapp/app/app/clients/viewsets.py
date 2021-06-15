@@ -104,7 +104,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             return ClientSerializer
 
     def get_permissions(self):
-        if self.action == 'client_posts' and self.request.method == 'GET':
+        if (self.action == 'client_posts' and self.request.method == 'GET') or self.action == 'retrieve':
             permission_classes = [IsAuthenticatedOrIsClient]
         else:
             permission_classes = [permissions.IsAuthenticated]
@@ -112,9 +112,9 @@ class ClientViewSet(viewsets.ModelViewSet):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrIsClient]
 
 
 class PostFileViewSet(viewsets.ModelViewSet):
