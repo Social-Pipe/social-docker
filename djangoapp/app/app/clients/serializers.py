@@ -20,10 +20,12 @@ class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PostFileSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(
+        max_length=None, allow_empty_file=True, use_url=False)
+
     class Meta:
         model = PostFile
-        fields = ['id', 'post', 'file', 'created_at']
-        depth = 1
+        fields = ['id', 'file', 'created_at']
 
 
 class CreatePostFileSerializer(serializers.ModelSerializer):
