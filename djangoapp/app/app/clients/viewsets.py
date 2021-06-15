@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser, CamelCaseJSONParser
 
 from app.clients.models import Client, Post, PostFile, Comment
-from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer, CreatePostFileSerializer
+from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer, CreatePostFileSerializer, CreateCommentSerializer
 from app.clients.permissions import IsAuthenticatedOrIsClient
 
 import json
@@ -142,8 +142,17 @@ class PostFileViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    # serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrIsClient]
+
+    def get_serializer_class(self):
+        """
+        Instantiates and returns the list of serializers that this view requires.
+        """
+        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
+            return CreateCommentSerializer
+        else:
+            return CommentSerializer
 
 
 '''

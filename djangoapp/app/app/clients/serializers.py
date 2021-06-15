@@ -25,10 +25,12 @@ class PostFileSerializer(serializers.ModelSerializer):
         fields = ['id', 'post', 'file', 'created_at']
         depth = 1
 
+
 class CreatePostFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostFile
         fields = ['post', 'file']
+
 
 class CreatePostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -41,6 +43,12 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'writer', 'message', 'created_at']
+
+
+class CreateCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['post', 'writer', 'message']
 
 
 class PostSerializer(serializers.ModelSerializer):
