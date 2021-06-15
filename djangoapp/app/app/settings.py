@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from corsheaders.defaults import default_headers
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -40,6 +41,10 @@ ALLOWED_HOSTS = [
 
 # https://github.com/adamchainz/django-cors-headers#configuration
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-client',
+]
 
 AUTH_USER_MODEL = 'core.User'
 
