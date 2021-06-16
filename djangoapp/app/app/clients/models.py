@@ -40,6 +40,7 @@ class Post(models.Model):
     caption = models.TextField()
     posting_date = models.DateTimeField()
     publish = models.BooleanField(default=False)
+    archive = models.BooleanField(default=False)
     status = models.CharField(max_length=9, choices=STATUS_CHOICES, blank=False, null=False, default="NONE")
     client  = models.ForeignKey(
         'Client', on_delete=models.CASCADE, blank=True, null=True)
@@ -51,6 +52,7 @@ class Post(models.Model):
 
 class PostFile(models.Model):
     file = models.FileField(upload_to='client/files/', null=True, blank=True)
+    order = models.IntegerField(default=1)
     post  = models.ForeignKey(
         'Post', related_name='files', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

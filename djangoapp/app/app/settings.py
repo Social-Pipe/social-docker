@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'app.core',
     'app.clients',
+    'app.payments',
     'corsheaders',
 ]
 
