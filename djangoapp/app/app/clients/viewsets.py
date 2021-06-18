@@ -13,6 +13,7 @@ from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCase
 from app.clients.models import Client, Post, PostFile, Comment
 from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer, CreatePostFileSerializer, CreateCommentSerializer
 from app.clients.permissions import IsAuthenticatedOrIsClient
+from app.payments.utils import create_subscription
 
 import json
 from pprint import pprint
@@ -52,6 +53,8 @@ class ClientViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
     def create(self, request):
+        create_subscription(user_id=request.user.id)
+        asdf
         logo = request.data['logo']
         client = Client(**request.data)
         client.name = request.data['name']

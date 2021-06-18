@@ -12,7 +12,7 @@ class Client(models.Model):
     facebook = models.BooleanField(default=False)
     linkedin = models.BooleanField(default=False)
     user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+        get_user_model(), related_name='clients', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

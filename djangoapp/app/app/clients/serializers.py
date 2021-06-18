@@ -25,13 +25,13 @@ class PostFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostFile
-        fields = ['id', 'file', 'created_at']
+        fields = ['id', 'file', 'order', 'created_at']
 
 
 class CreatePostFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostFile
-        fields = ['post', 'file']
+        fields = ['post', 'file', 'order']
 
 
 class CreatePostSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,7 +60,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'files', 'caption',
-                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status', 'comments']
+                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status', 'archive', 'comments']
         depth = 2
 
 

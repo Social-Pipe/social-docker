@@ -63,12 +63,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 request.data.pop('email')
             User.objects.filter(pk=pk).update(**request.data)
             user = get_object_or_404(User, pk=pk)
-            payment = Payment.objects.get(user_id=pk)
-            user.payment = payment 
-            address = Address.objects.get(payment_id=payment.id)
-            user.payment.address = address
             serializer = UserSerializer(
-                user, many=False, context={'request': request})
+                user, many=False)
             return Response(serializer.data)
         except IntegrityError as e:
             raise UniqueEmail(
@@ -80,11 +76,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_id = kwargs.get('pk', None)
         user = User.objects.get(pk=user_id)
-        payment = Payment.objects.filter(user=user).first()
-        address = Address.objects.filter(payment=payment).first()
-        payment.address = address
-        user.payment = payment
-        serializer = UserSerializer(user, many=False)
+        serializer = UserSerializer(user, many=False, context={'request': request})
         return Response(serializer.data)
 
     def get_permissions(self):

@@ -23,15 +23,16 @@ class AddressSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PaymentSerializer(serializers.HyperlinkedModelSerializer):
-    address = AddressSerializer(many=False)
+    address = AddressSerializer(many=True)
 
     class Meta:
         model = Payment
         fields = ['address', 'card_id']
+        depth = 2
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    payment = PaymentSerializer(many=False)
+    payment = PaymentSerializer(many=True)
 
     class Meta:
         model = get_user_model()
