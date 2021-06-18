@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from app.payments import PAGARME_API_KEY, PAGARME_ENCRYPTION_KEY
 from app.payments.models import Subscription, Transaction
 
+from rest_framework.exceptions import ValidationError
+
 from pprint import pprint
 import pagarme
 
@@ -74,15 +76,18 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
     })
 
     pprint(subscription)
-    subscription_id = subscription['id']
-    # https://pagar.me/customers/#/subscriptions/{subscription_id}?token={subscription_token}
-    subscription_token = subscription['manage_token']
-    subscription_status = 'OPENED' if subscription['status'] == 'paid' else 'CANCELED'
-    transaction_id = subscription['current_transaction']['id']
-    transaction_price = int(subscription['plan']['amount'])/100
-    transaction_status = 'PAID' if subscription['status'] == 'paid' else 'ERROR'
-    customer_id = subscription['customer']['id']
-    plan_id = subscription['plan']['id']
+    try:
+        subscription_id = subscription['id']
+        # https://pagar.me/customers/#/subscriptions/{subscription_id}?token={subscription_token}
+        subscription_token = subscription['manage_token']
+        subscription_status = 'OPENED' if subscription['status'] == 'paid' else 'CANCELED'
+        transaction_id = subscription['current_transaction']['id']
+        transaction_price = int(subscription['plan']['amount'])/100
+        transaction_status = 'PAID' if subscription['status'] == 'paid' else 'ERROR'
+        customer_id = subscription['customer']['id']
+        plan_id = subscription['plan']['id']
+    except Exception as e:
+        raise ValidationError(detail='Erro no processamento de pagamento, veritifique dados do cartão de crédito ou usuários com CPF duplicados')
 
     if user.pagarme_customer_id != customer_id:
         user.pagarme_customer_id = customer_id
@@ -93,6 +98,7 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
     subscription_instance.save()
     transaction_instance = Transaction(
         pagarme_id=transaction_id, price=transaction_price, status=transaction_status, subscription=subscription_instance)
+    transaction_instance.save()
 
     return subscription
 

@@ -20,7 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    pagarme_customer_id = models.PositiveBigIntegerField()
+    pagarme_customer_id = models.PositiveBigIntegerField(blank=True, null=True)
 
     objects = UserManager()
 

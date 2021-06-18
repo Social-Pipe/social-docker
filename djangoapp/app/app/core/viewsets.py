@@ -6,11 +6,14 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
 from app.core.serializers import SimplifiedUserSerializer, UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
+from app.payments.models import Transaction
+from app.payments.serializers import TransactionSerializer
 
 from pprint import pprint
 
@@ -27,17 +30,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
+            payment_data = request.data['payment'][0]
+            request.data.pop('payment')
+            address_data = payment_data.pop('address')[0]
             user = User(**request.data)
             user.set_password(request.data.get('password', None))
-            payment_data = request.data['payment']
-            address_data = payment_data['address']
-            payment = Payment(**payment_data)
-            address = Address(**address_data)
             user.save()
-            payment.user = user
+            payment = Payment(**payment_data)
             payment.save()
-            address.payment = payment
+            user.payment.set([payment])
+            address = Address(**address_data)
             address.save()
+            payment.address.set([address])
             serializer = UserSerializer(
                 user, many=False, context={'request': request})
             return Response(serializer.data)
@@ -55,7 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 if 'address' in payment_data:
                     address_data = payment_data['address']
                     payment = Payment.objects.get(user_id=pk)
-                    Address.objects.filter(payment_id=payment.id).update(**address_data)
+                    Address.objects.filter(
+                        payment_id=payment.id).update(**address_data)
                     payment_data.pop('address')
                 Payment.objects.filter(user_id=pk).update(**payment_data)
             # Email não é editável
@@ -76,7 +81,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         user_id = kwargs.get('pk', None)
         user = User.objects.get(pk=user_id)
-        serializer = UserSerializer(user, many=False, context={'request': request})
+        serializer = UserSerializer(
+            user, many=False, context={'request': request})
         return Response(serializer.data)
 
     def get_permissions(self):
@@ -101,6 +107,14 @@ class UserViewSet(viewsets.ModelViewSet):
             return CreateUserSerializer
         else:
             return UserSerializer
+
+    @action(methods=["get"], detail=True, url_path="transactions", name="user_transactions")
+    def user_transactions(self, request, *args, **kwargs):
+        transactions = Transaction.objects.filter(subscription__user__id=request.user.id).all()
+        print(transactions)
+        serializer = TransactionSerializer(
+            transactions, many=True)
+        return Response(serializer.data)
 
 
 class GroupViewSet(viewsets.ModelViewSet):

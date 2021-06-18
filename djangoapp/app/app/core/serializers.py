@@ -41,7 +41,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
-    payment = PaymentSerializer(many=False)
+    payment = PaymentSerializer(many=True)
 
     class Meta:
         model = get_user_model()

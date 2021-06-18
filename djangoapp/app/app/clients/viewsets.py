@@ -53,8 +53,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
     def create(self, request):
-        create_subscription(user_id=request.user.id)
-        asdf
         logo = request.data['logo']
         client = Client(**request.data)
         client.name = request.data['name']
@@ -67,12 +65,8 @@ class ClientViewSet(viewsets.ModelViewSet):
         client.access_hash = get_random_string(length=16)
         user = User.objects.get(pk=request.user.id)
         client.user = user
+        create_subscription(user_id=request.user.id)
         client.save()
-        #
-        #
-        # Realizar pagamento junto à pagarme
-        #
-        #
         serializer = ClientSerializer(
             client, many=False, context={'request': request})
         return Response(serializer.data)
