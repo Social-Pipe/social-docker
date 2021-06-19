@@ -1,15 +1,16 @@
 from rest_framework import serializers
 from app.clients.models import Client, Post, PostFile, Comment
+from app.payments.serializers import SubscriptionSerializer
 
-
-class ClientSerializer(serializers.HyperlinkedModelSerializer):
+class ClientSerializer(serializers.ModelSerializer):
     logo = serializers.ImageField(
         max_length=None, allow_empty_file=True, use_url=False)
+    subscription = SubscriptionSerializer(many=False)
 
     class Meta:
         model = Client
         fields = ['id', 'logo', 'name', 'access_hash',
-                  'instagram', 'facebook', 'linkedin']
+                  'instagram', 'facebook', 'linkedin', 'subscription']
 
 
 class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
@@ -18,6 +19,12 @@ class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'url', 'logo', 'name', 'password',
                   'instagram', 'facebook', 'linkedin']
 
+class PatchClientSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    
+    class Meta:
+        model = Client
+        fields = ['logo', 'name', 'instagram', 'facebook', 'linkedin']
 
 class PostFileSerializer(serializers.ModelSerializer):
     file = serializers.FileField(

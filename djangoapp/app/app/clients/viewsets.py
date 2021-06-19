@@ -4,6 +4,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -11,9 +12,9 @@ from rest_framework.response import Response
 from djangorestframework_camel_case.parser import CamelCaseFormParser, CamelCaseMultiPartParser, CamelCaseJSONParser
 
 from app.clients.models import Client, Post, PostFile, Comment
-from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer, CreatePostFileSerializer, CreateCommentSerializer
+from app.clients.serializers import ClientSerializer, CreateClientSerializer, PostSerializer, CreatePostSerializer, PostFileSerializer, CommentSerializer, CreatePostFileSerializer, CreateCommentSerializer, PatchClientSerializer
 from app.clients.permissions import IsAuthenticatedOrIsClient
-from app.payments.utils import create_subscription
+from app.payments.utils import create_subscription, cancel_subscription
 
 import json
 from pprint import pprint
@@ -54,7 +55,8 @@ class ClientViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         logo = request.data['logo']
-        client = Client(**request.data)
+        subscription = create_subscription(user_id=request.user.id)
+        client = Client(**request.data, subscription=subscription)
         client.name = request.data['name']
         client.facebook = json.loads(request.data['facebook'])
         client.instagram = json.loads(request.data['instagram'])
@@ -65,11 +67,20 @@ class ClientViewSet(viewsets.ModelViewSet):
         client.access_hash = get_random_string(length=16)
         user = User.objects.get(pk=request.user.id)
         client.user = user
-        create_subscription(user_id=request.user.id)
         client.save()
         serializer = ClientSerializer(
             client, many=False, context={'request': request})
         return Response(serializer.data)
+    
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            cancel_subscription(instance.subscription.pagarme_id)
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -91,8 +102,10 @@ class ClientViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of serializers that this view requires.
         """
-        if self.action == 'create' or self.action == 'update' or self.action == 'partial_update':
+        if self.action == 'create':
             return CreateClientSerializer
+        elif self.action == 'update' or self.action == 'partial_update':
+            return PatchClientSerializer
         elif self.action == 'client_posts' and self.request.method == 'POST':
             return CreatePostSerializer
         elif self.action == 'client_posts' and self.request.method == 'GET':

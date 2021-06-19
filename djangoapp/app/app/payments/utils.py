@@ -94,7 +94,6 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
         'refused': 'REFUSED'
     }
 
-    pprint(subscription)
     try:
         subscription_id = subscription['id']
         # https://pagar.me/customers/#/subscriptions/{subscription_id}?token={subscription_token}
@@ -123,7 +122,7 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
             pagarme_id=transaction_id, price=transaction_price, status=transaction_status, subscription=subscription_instance)
         transaction_instance.save()
 
-    return subscription
+    return subscription_instance
 
 
 def get_subscriptions(user_id: int):
@@ -154,9 +153,12 @@ def get_transactions(user_id: int):
             subscription_transactions.append(transaction)
         
         transactions.append(subscription_transactions[0])
-        pprint(transactions)
     return transactions
 
 
 def cancel_subscription(subscription_id: int):
-    subscription = pagarme.subscription.cancel("ID_DA_SUBSCRIPTION")
+    subscription_instance = Subscription.objects.get(pagarme_id=subscription_id)
+    subscription = pagarme.subscription.cancel(subscription_id)
+    subscription_instance.status = subscription['status'].upper()
+    subscription_instance.save()
+    return subscription

@@ -20,6 +20,7 @@ class Transaction(models.Model):
     subscription = models.ForeignKey(
         'Subscription', related_name='transactions', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Subscription(models.Model):
@@ -39,3 +40,4 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         get_user_model(), related_name='subscriptions', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

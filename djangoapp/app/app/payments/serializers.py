@@ -7,6 +7,11 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
 
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+
 
 class PagarmeSubscriptionSerializer(serializers.Serializer):
     # https://www.django-rest-framework.org/api-guide/fields

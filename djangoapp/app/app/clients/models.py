@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+from app.payments.models import Subscription
 
 class Client(models.Model):
     logo = models.ImageField(upload_to='client/logo/', null=True, blank=True)
@@ -13,6 +13,12 @@ class Client(models.Model):
     linkedin = models.BooleanField(default=False)
     user = models.ForeignKey(
         get_user_model(), related_name='clients', on_delete=models.CASCADE, blank=True, null=True)
+    subscription = models.OneToOneField(
+        Subscription,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
