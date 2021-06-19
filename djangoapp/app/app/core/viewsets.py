@@ -12,8 +12,9 @@ from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
 from app.core.serializers import SimplifiedUserSerializer, UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
+from app.payments.utils import get_transactions
 from app.payments.models import Transaction
-from app.payments.serializers import TransactionSerializer
+from app.payments.serializers import PagarmeTransactionSerializer
 
 from pprint import pprint
 
@@ -110,9 +111,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=["get"], detail=True, url_path="transactions", name="user_transactions")
     def user_transactions(self, request, *args, **kwargs):
-        transactions = Transaction.objects.filter(subscription__user__id=request.user.id).all()
-        print(transactions)
-        serializer = TransactionSerializer(
+        transactions = get_transactions(request.user.id)
+        serializer = PagarmeTransactionSerializer(
             transactions, many=True)
         return Response(serializer.data)
 

@@ -150,13 +150,3 @@ class CommentViewSet(viewsets.ModelViewSet):
             return CreateCommentSerializer
         else:
             return CommentSerializer
-
-
-'''
-/client-token
-hash
-password
-isAuthenticatedOrIsClient
-verificar se tem reques.user, senão verifica por outro token e se tem scope client no payload e sub (subject) o hash do cliente
-se não, False
-'''
