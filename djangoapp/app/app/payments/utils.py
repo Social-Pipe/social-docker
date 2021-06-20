@@ -152,7 +152,7 @@ def get_transactions(user_id: int):
             transaction['subscription']['created_at'] = subscription_pagarme[0]['date_created']
             subscription_transactions.append(transaction)
         
-        transactions.append(subscription_transactions[0])
+        transactions.append(subscription_transactions)
     return transactions
 
 
