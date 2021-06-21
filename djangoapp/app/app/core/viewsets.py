@@ -55,10 +55,10 @@ class UserViewSet(viewsets.ModelViewSet):
             if 'password' in request.data:
                 user.set_password(request.data.get('password', None))
             if 'payment' in request.data:
-                payment_data = request.data['payment']
+                payment_data = request.data['payment'][0]
                 request.data.pop('payment')
                 if 'address' in payment_data:
-                    address_data = payment_data['address']
+                    address_data = payment_data['address'][0]
                     payment = Payment.objects.get(user_id=pk)
                     Address.objects.filter(
                         payment_id=payment.id).update(**address_data)
