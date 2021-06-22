@@ -1,15 +1,16 @@
-FROM node:14.14.0 as build_stage
+FROM node:14.14.0-alpine as build_stage
 
-WORKDIR /app
-COPY reactapp/package.json .
-COPY reactapp/.env.docker .env
-RUN yarn
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
 COPY reactapp .
+COPY reactapp/package.json .
+COPY reactapp/.env.production .env
+RUN yarn 
 RUN yarn build
 
 FROM nginx:1.16.0-alpine
 
-COPY --from=build_stage /app/build /usr/share/nginx/html
+COPY --from=build_stage /home/node/app/build /usr/share/nginx/html
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

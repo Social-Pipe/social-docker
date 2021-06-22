@@ -10,9 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from corsheaders.defaults import default_headers
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '0ca0$&@1mf7w%-u@onxvazfi8qm$otu_5l1v(r7d2=!2)k0!1j'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'webmail.jogodabiblia.com',
+    '162.214.108.8',
     '192.168.100.17',
     '127.0.0.1',
     'djangoapp',
@@ -35,10 +41,23 @@ ALLOWED_HOSTS = [
     'localhost:3000',
 ]
 
+# https://github.com/adamchainz/django-cors-headers#configuration
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-client',
+]
+
 AUTH_USER_MODEL = 'core.User'
 
-# Application definition
+# SMTP definitions
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_USE_SSL = os.environ['EMAIL_USE_SSL']
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +70,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'app.core',
     'app.clients',
+    'app.payments',
     'corsheaders',
 ]
 
@@ -127,6 +147,7 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -135,10 +156,13 @@ REST_FRAMEWORK = {
     ],
     # To Preatty response comment code bellow
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
+        'djangorestframework_camel_case.parser.CamelCaseFormParser',
+        'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
     ],
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -158,6 +182,12 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'description': 'API JWT accessToken',
             'name': 'Authorization',
+            'in': 'header'
+        },
+        'X-Client': {
+            'type': 'apiKey',
+            'description': 'Client JWT accessToken',
+            'name': 'X-Client',
             'in': 'header'
         }
     }

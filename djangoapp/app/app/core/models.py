@@ -20,6 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    pagarme_customer_id = models.PositiveBigIntegerField(blank=True, null=True)
 
     objects = UserManager()
 
@@ -68,11 +69,11 @@ class Address(models.Model):
     state_uf = models.CharField(max_length=2)
     neighborhood = models.CharField(max_length=128)
     payment = models.ForeignKey(
-        'Payment', on_delete=models.CASCADE, blank=True, null=True)
+        'Payment', related_name='address', on_delete=models.CASCADE, blank=True, null=True)
 
 
 # https://docs.pagar.me/docs/realizando-uma-transacao-de-cartao-de-credito#criando-um-cart%C3%A3o-para-one-click-buy
 class Payment(models.Model):
     card_id = models.CharField(max_length=64)
     user = models.ForeignKey(
-        'User', on_delete=models.CASCADE, blank=True, null=True)
+        'User', related_name='payment', on_delete=models.CASCADE, blank=True, null=True)
