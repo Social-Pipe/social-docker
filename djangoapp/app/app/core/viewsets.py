@@ -53,9 +53,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         try:
-            if 'password' in request.data:
-                user.set_password(request.data.get('password', None))
-                user.save()
             if 'payment' in request.data:
                 payment_data = request.data['payment'][0]
                 request.data.pop('payment')
@@ -70,6 +67,9 @@ class UserViewSet(viewsets.ModelViewSet):
             if 'email' in request.data:
                 request.data.pop('email')
             User.objects.filter(pk=pk).update(**request.data)
+            if 'password' in request.data:
+                user.set_password(request.data.get('password', None))
+                user.save()
             serializer = UserSerializer(
                 user, many=False)
             return Response(serializer.data)
