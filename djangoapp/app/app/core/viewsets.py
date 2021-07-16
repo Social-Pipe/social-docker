@@ -51,6 +51,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 detail=f"email {request.data['email']} already exists, {e}")
 
     def partial_update(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
         try:
             if 'password' in request.data:
                 user.set_password(request.data.get('password', None))
@@ -68,7 +69,6 @@ class UserViewSet(viewsets.ModelViewSet):
             if 'email' in request.data:
                 request.data.pop('email')
             User.objects.filter(pk=pk).update(**request.data)
-            user = get_object_or_404(User, pk=pk)
             serializer = UserSerializer(
                 user, many=False)
             return Response(serializer.data)
