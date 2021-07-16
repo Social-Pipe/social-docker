@@ -55,6 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             if 'password' in request.data:
                 user.set_password(request.data.get('password', None))
+                user.save()
             if 'payment' in request.data:
                 payment_data = request.data['payment'][0]
                 request.data.pop('payment')
