@@ -33,3 +33,9 @@ docker exec -it postbaker_djangoapp bash -c "cd /usr/src/app/app && python manag
 ```sh
 docker-compose -f docker-compose.prod.yml up -d
 ```
+
+### Certbot
+
+```sh
+certbot -d app.postbaker.com.br
+```
