@@ -39,7 +39,7 @@ class RecoverPassword(generics.GenericAPIView):
             Você pode modificar essa nova senha na página de configurações do Postbaker.
 
             Equipe Postbaker.''',
-            'naoresponda@filipelopes.me',
+            'naoresponda@app.postbaker.com.br',
             [user.email],
             fail_silently=False,
         )
