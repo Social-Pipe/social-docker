@@ -73,7 +73,7 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
         "payment_method": payment_method,
         "plan_id": plan_id,
         "soft_descriptor": "POSTBAKER",
-        "postback_url": "http://filipelopes.me"
+        "postback_url": "https://app.postbaker.com.br"
     })
 
     subscription_status_map = {
