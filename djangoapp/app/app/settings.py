@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     'djangoapp',
     'localhost',
     'localhost:3000',
+    'app.postbaker.com.br',
 ]
 
 # https://github.com/adamchainz/django-cors-headers#configuration
