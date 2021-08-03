@@ -56,6 +56,8 @@ EMAIL_PORT = os.environ['EMAIL_PORT']
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_SSL = os.environ['EMAIL_USE_SSL']
+# Payment definitions
+PAYMENT_ENV = 'development'
 
 # Application definition
 INSTALLED_APPS = [
