@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from app.payments import PAGARME_API_KEY, PAGARME_ENCRYPTION_KEY
 from app.payments.models import Subscription, Transaction
@@ -43,19 +44,27 @@ def find_plans(id):
 
 
 def create_subscription(user_id, plan_id="590625", payment_method="credit_card"):
+    
     print('=================== PAGARME ====================')
     user = get_object_or_404(User, pk=user_id)
-    print(">>> USER DATA:")
+    print("#### USER DATA ####")
     pprint(user.__dict__)
-    print(">>> PAYMENT DATA:")
+    print("#### PAYMENT DATA ####")
     payment_data = user.payment.all()[0]
     pprint(payment_data.__dict__)
     card_id = payment_data.card_id
     address = payment_data.address.all()[0]
-    print(">>> ADDRESS DATA:")
+    print("#### ADDRESS DATA ####")
     pprint(address.__dict__)
+
+    # Verifica se está no ambiente de produção para colocar o plano relativo no ambiente de produção:
+    if settings.PAYMENT_ENV == 'production':
+        plan_id = "1383973"
+
     if len(user.clients.all()) == 0:
         plan_id = "590624"
+        if settings.PAYMENT_ENV == 'production':
+            plan_id = "1383972"
 
     subscription = pagarme.subscription.create({
         "card_id": card_id,
