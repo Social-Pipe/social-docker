@@ -45,10 +45,14 @@ def find_plans(id):
 def create_subscription(user_id, plan_id="590625", payment_method="credit_card"):
     print('=================== PAGARME ====================')
     user = get_object_or_404(User, pk=user_id)
+    print(">>> USER DATA:")
     pprint(user.__dict__)
+    print(">>> PAYMENT DATA:")
     payment_data = user.payment.all()[0]
+    pprint(payment_data.__dict__)
     card_id = payment_data.card_id
     address = payment_data.address.all()[0]
+    print(">>> ADDRESS DATA:")
     pprint(address.__dict__)
     if len(user.clients.all()) == 0:
         plan_id = "590624"
