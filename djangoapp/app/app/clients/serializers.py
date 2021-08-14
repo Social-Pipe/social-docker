@@ -24,7 +24,7 @@ class PatchClientSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Client
-        fields = ['logo', 'name', 'instagram', 'facebook', 'linkedin']
+        fields = ['logo', 'name', 'password', 'instagram', 'facebook', 'linkedin']
 
 class PostFileSerializer(serializers.ModelSerializer):
     file = serializers.FileField(
