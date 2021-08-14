@@ -21,6 +21,7 @@ class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
 
 class PatchClientSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
+    password = serializers.CharField(required=False)
     
     class Meta:
         model = Client

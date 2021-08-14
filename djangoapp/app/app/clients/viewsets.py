@@ -71,6 +71,29 @@ class ClientViewSet(viewsets.ModelViewSet):
         serializer = ClientSerializer(
             client, many=False, context={'request': request})
         return Response(serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        client = get_object_or_404(
+                Client, access_hash=kwargs.get('access_hash', None))
+        if client:
+            print(request.data)
+            logo = request.data.get('logo', None)
+            client.name = request.data.get('name', None) or client.name
+            if request.data.get('facebook', None):
+                client.facebook = json.loads(request.data['facebook']) or client.facebook
+            if request.data.get('instagram', None):
+                client.instagram = json.loads(request.data['instagram']) or client.instagram
+            if request.data.get('linkedin', None):
+                client.linkedin = json.loads(request.data['linkedin']) or client.linkedin
+            if logo:
+                client.logo = default_storage.save(
+                    f"client/logo/{logo.name}", ContentFile(logo.read()))
+            if request.data.get('password', None):
+                client.password = make_password(request.data.get('password', None))
+            client.save()
+            serializer = ClientSerializer(
+                client, many=False, context={'request': request})
+            return Response(serializer.data)
     
 
     def destroy(self, request, *args, **kwargs):
