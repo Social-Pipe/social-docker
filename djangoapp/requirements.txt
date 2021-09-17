@@ -10,7 +10,7 @@ django-sass
 drf-yasg==1.20.0
 gunicorn
 markdown
-pagarme-python
+pagarme-python==4.0.2
 Pygments
 python-dotenv
 Pillow
@@ -18,3 +18,4 @@ pyyaml
 pyjwt
 psycopg2-binary
 uritemplate
+requests

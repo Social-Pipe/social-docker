@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import os
 
+from app.payments.utils import get_subscriptions
+
 
 class ListenSubscriptionStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -13,6 +15,13 @@ class ListenSubscriptionStatus(APIView):
         print(f'Atualizado status de subscription {pagarme_subscription_id}')
         usernames = [user.username for user in User.objects.all()]
         return Response(usernames)
+
+class ClientSubscription(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request, client_id, format=None):
+        subscriptions = get_subscriptions(client_id)
+        return Response(subscriptions)
 
 
 class ApiKey(APIView):

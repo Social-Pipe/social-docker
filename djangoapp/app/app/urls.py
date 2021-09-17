@@ -29,7 +29,7 @@ from rest_framework_simplejwt.views import (
 from .router import router
 from app.clients.views import ClientToken
 from app.core.views import RecoverPassword
-from app.payments.views import ListenSubscriptionStatus, ApiKey
+from app.payments.views import ListenSubscriptionStatus, ClientSubscription, ApiKey
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -53,7 +53,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/', include(router.urls)),
-    re_path(r'api/v1/pagarme/listen_subscription_status/(?P<pagarme_subscription_id>[-\w]+)', ListenSubscriptionStatus.as_view()),
+    re_path(
+        r'api/v1/pagarme/listen_subscription_status/(?P<pagarme_subscription_id>[-\w]+)', ListenSubscriptionStatus.as_view()),
+    re_path(
+        r'api/v1/pagarme/client_subscription/(?P<client_id>[\d]+)', ClientSubscription.as_view()),
     path('api/v1/pagarme/api_key/', ApiKey.as_view()),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

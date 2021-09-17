@@ -6,6 +6,8 @@ from app.payments import PAGARME_API_KEY, PAGARME_ENCRYPTION_KEY
 from app.payments.models import Subscription, Transaction
 from app.payments.serializers import PagarmeTransactionSerializer
 
+from app.clients.models import Client
+
 from rest_framework.exceptions import ValidationError
 
 from pprint import pprint
@@ -44,7 +46,7 @@ def find_plans(id):
 
 
 def create_subscription(user_id, plan_id="590625", payment_method="credit_card"):
-    
+
     print('=================== PAGARME ====================')
     user = get_object_or_404(User, pk=user_id)
     print("#### USER DATA ####")
@@ -138,8 +140,13 @@ def create_subscription(user_id, plan_id="590625", payment_method="credit_card")
     return subscription_instance
 
 
-def get_subscriptions(user_id: int):
-    pass
+def get_subscriptions(client_id: int):
+    client = get_object_or_404(Client, pk=client_id)
+    print(client.subscription.pagarme_id)
+    subscription = pagarme.subscription.find_by(
+        {"id": client.subscription.pagarme_id})
+    print(subscription)
+    return subscription[0]
 
 
 def get_transactions(user_id: int):
@@ -161,17 +168,19 @@ def get_transactions(user_id: int):
             transaction['subscription'] = {}
             transaction['subscription']['pagarme_id'] = subscription_pagarme[0]['id']
             transaction['subscription']['pagarme_plan_id'] = subscription_pagarme[0]['plan']['id']
-            transaction['subscription']['status'] = subscription_pagarme[0]['status'].upper()
+            transaction['subscription']['status'] = subscription_pagarme[0]['status'].upper(
+            )
             transaction['subscription']['created_at'] = subscription_pagarme[0]['date_created']
             subscription_transactions.append(transaction)
-        
+
         if len(subscription_transactions):
             transactions.append(subscription_transactions[0])
     return transactions
 
 
 def cancel_subscription(subscription_id: int):
-    subscription_instance = Subscription.objects.get(pagarme_id=subscription_id)
+    subscription_instance = Subscription.objects.get(
+        pagarme_id=subscription_id)
     subscription = pagarme.subscription.cancel(subscription_id)
     subscription_instance.status = subscription['status'].upper()
     subscription_instance.save()
