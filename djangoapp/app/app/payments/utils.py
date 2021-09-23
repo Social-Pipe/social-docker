@@ -11,6 +11,7 @@ from app.clients.models import Client
 from rest_framework.exceptions import ValidationError
 
 from pprint import pprint
+import requests
 import pagarme
 
 pagarme.authentication_key(PAGARME_API_KEY)
@@ -147,6 +148,27 @@ def get_subscriptions(client_id: int):
         {"id": client.subscription.pagarme_id})
     print(subscription)
     return subscription[0]
+
+
+def update_subscriptions(user_id: int, card_id: str):
+    user = get_object_or_404(User, pk=user_id)
+    clients = Client.objects.filter(user=user).all()
+    # subscriptions = []
+    for client in clients:
+        print("=============================")
+        print(card_id)
+        # o sdk em python não estava funcionando de jeito nenhum, por isso a utilização direta do endpoint
+        r = requests.put(f"https://api.pagar.me/1/subscriptions/{client.subscription.pagarme_id}", json={
+            "api_key": PAGARME_API_KEY,
+            "card_id": "card_cj41mpuhc01bb3f6d8exeo072",
+            "payment_method": "credit_card",
+        })
+        print(r.text)
+
+        # print(subscription)
+        # subscriptions.append(subscription)
+
+    # return subscriptions
 
 
 def get_transactions(user_id: int):
