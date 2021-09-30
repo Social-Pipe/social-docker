@@ -7,7 +7,7 @@ services:
     ports:
       - "${REACT_APP_PORT}:3000"
     volumes:
-      - /home/node/app/node_modules
+      - ./reactapp/node_modules:/home/node/app/node_modules
       - ./reactapp:/home/node/app
     links:
       - djangoapp
