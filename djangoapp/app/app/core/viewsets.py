@@ -55,9 +55,10 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             if 'payment' in request.data:
                 payment_data = request.data['payment'][0]
-                card_id = payment_data['card_id']
-                # Atualiza forma de pagamento em todas as subscriptions de clientes
-                # update_subscriptions(user_id=user.id, card_id=card_id)
+                if 'card_id' in payment_data:
+                    card_id = payment_data['card_id']
+                    # Atualiza forma de pagamento em todas as subscriptions de clientes
+                    update_subscriptions(user_id=user.id, card_id=card_id)
                 request.data.pop('payment')
                 if 'address' in payment_data:
                     address_data = payment_data['address'][0]

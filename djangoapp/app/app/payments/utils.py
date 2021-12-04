@@ -155,16 +155,16 @@ def update_subscriptions(user_id: int, card_id: str):
     clients = Client.objects.filter(user=user).all()
     # subscriptions = []
     for client in clients:
-        print("=============================")
-        print(card_id)
+        # print("=============================")
+        # print(card_id)
         # o sdk em python não estava funcionando de jeito nenhum, por isso a utilização direta do endpoint
+        print(client.subscription.pagarme_id)
         r = requests.put(f"https://api.pagar.me/1/subscriptions/{client.subscription.pagarme_id}", json={
             "api_key": PAGARME_API_KEY,
-            "card_id": "card_cj41mpuhc01bb3f6d8exeo072",
+            "card_id": card_id,
             "payment_method": "credit_card",
         })
-        print(r.text)
-
+        # print(r.text)
         # print(subscription)
         # subscriptions.append(subscription)
 
