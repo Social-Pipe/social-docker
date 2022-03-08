@@ -52,8 +52,6 @@ class DatabaseTest(APIView):
 
     def get(self, request, format=None):
         migrations = MigrationRecorder.Migration.objects.all()
-        for migration in migrations:
-            print(migration.__dict__)
         serializer = MigrationSerializer(migrations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
