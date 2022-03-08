@@ -14,7 +14,7 @@ services:
   db:
     container_name: postbaker_db
     restart: always
-    image: postgres
+    image: postgres:13.5-alpine
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
