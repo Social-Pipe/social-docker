@@ -14,12 +14,14 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ['id', 'logo', 'name', 'access_hash',
                   'instagram', 'facebook', 'linkedin', 'subscription']
 
+
 class ClientPostSerializer(serializers.ModelSerializer):
     user = SimplifiedUserSerializer(many=False)
-    
+
     class Meta:
         model = Client
         fields = ['id', 'name', 'user']
+
 
 class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
