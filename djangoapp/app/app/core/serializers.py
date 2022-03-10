@@ -5,14 +5,12 @@ from django.db.models.fields import EmailField
 from rest_framework import serializers
 
 from app.core.models import Payment, Address
-from app.clients.models import Client
-from app.clients.serializers import CreateClientSerializer
 
 
 class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['id', 'url', 'email', 'name', 'cpf', 'phone']
+        fields = ['id', 'url', 'email', 'name', 'phone']
 
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
