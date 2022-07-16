@@ -5,14 +5,12 @@ from django.db.models.fields import EmailField
 from rest_framework import serializers
 
 from app.core.models import Payment, Address
-from app.clients.models import Client
-from app.clients.serializers import CreateClientSerializer
 
 
 class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['id', 'url', 'email', 'name', 'cpf', 'phone']
+        fields = ['id', 'url', 'email', 'name', 'phone']
 
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
@@ -49,11 +47,11 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
         depth = 2
 
     def create(self, validated_data):
-        payment = validated_data.pop('payment')
+        payment_data = validated_data.pop('payment')
         client = validated_data.pop('client')
         user = self.model.objects.create(**validated_data)
         address = payment_data.pop('address')
-        payment = Payment.objects.create(user=user, **payment)
+        payment_instance = Payment.objects.create(user=user, **payment_data)
         address = Address.objects.create(
             payment=payment_instance, **address)
         return user
@@ -67,3 +65,10 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserRecoverPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+class MigrationSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    app = serializers.CharField()
+    name = serializers.CharField()
+    applied = serializers.DateTimeField()

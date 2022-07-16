@@ -12,7 +12,7 @@ from app.core.permissions import IsAdminOrIsSelf
 from app.core.models import Address, Payment
 from app.core.serializers import SimplifiedUserSerializer, UserSerializer, CreateUserSerializer, GroupSerializer, AddressSerializer, PaymentSerializer
 from app.core.exceptions import UniqueEmail
-from app.payments.utils import get_transactions
+from app.payments.utils import get_transactions, update_subscriptions
 from app.payments.models import Transaction
 from app.payments.serializers import PagarmeTransactionSerializer
 
@@ -51,11 +51,14 @@ class UserViewSet(viewsets.ModelViewSet):
                 detail=f"email {request.data['email']} already exists, {e}")
 
     def partial_update(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
         try:
-            if 'password' in request.data:
-                user.set_password(request.data.get('password', None))
             if 'payment' in request.data:
                 payment_data = request.data['payment'][0]
+                if 'card_id' in payment_data:
+                    card_id = payment_data['card_id']
+                    # Atualiza forma de pagamento em todas as subscriptions de clientes
+                    update_subscriptions(user_id=user.id, card_id=card_id)
                 request.data.pop('payment')
                 if 'address' in payment_data:
                     address_data = payment_data['address'][0]
@@ -68,7 +71,9 @@ class UserViewSet(viewsets.ModelViewSet):
             if 'email' in request.data:
                 request.data.pop('email')
             User.objects.filter(pk=pk).update(**request.data)
-            user = get_object_or_404(User, pk=pk)
+            if 'password' in request.data:
+                user.set_password(request.data.get('password', None))
+                user.save()
             serializer = UserSerializer(
                 user, many=False)
             return Response(serializer.data)

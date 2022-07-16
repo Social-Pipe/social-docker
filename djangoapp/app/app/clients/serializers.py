@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from app.clients.models import Client, Post, PostFile, Comment
 from app.payments.serializers import SubscriptionSerializer
+from app.core.serializers import SimplifiedUserSerializer
+
 
 class ClientSerializer(serializers.ModelSerializer):
     logo = serializers.ImageField(
@@ -13,18 +15,30 @@ class ClientSerializer(serializers.ModelSerializer):
                   'instagram', 'facebook', 'linkedin', 'subscription']
 
 
+class ClientPostSerializer(serializers.ModelSerializer):
+    user = SimplifiedUserSerializer(many=False)
+
+    class Meta:
+        model = Client
+        fields = ['id', 'name', 'user']
+
+
 class CreateClientSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Client
         fields = ['id', 'url', 'logo', 'name', 'password',
                   'instagram', 'facebook', 'linkedin']
 
+
 class PatchClientSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
-    
+    password = serializers.CharField(required=False)
+
     class Meta:
         model = Client
-        fields = ['logo', 'name', 'instagram', 'facebook', 'linkedin']
+        fields = ['logo', 'name', 'password',
+                  'instagram', 'facebook', 'linkedin']
+
 
 class PostFileSerializer(serializers.ModelSerializer):
     file = serializers.FileField(
@@ -63,11 +77,12 @@ class CreateCommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     files = PostFileSerializer(many=True)
     comments = CommentSerializer(many=True)
+    client = ClientPostSerializer(many=False)
 
     class Meta:
         model = Post
         fields = ['id', 'files', 'caption',
-                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status', 'archive', 'comments']
+                  'instagram', 'facebook', 'linkedin', 'created_at', 'posting_date', 'publish', 'type', 'status', 'archive', 'comments', 'client']
         depth = 2
 
 

@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     'djangoapp',
     'localhost',
     'localhost:3000',
+    'app.postbaker.com.br',
 ]
 
 # https://github.com/adamchainz/django-cors-headers#configuration
@@ -56,6 +57,8 @@ EMAIL_PORT = os.environ['EMAIL_PORT']
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_SSL = os.environ['EMAIL_USE_SSL']
+# Payment definitions
+PAYMENT_ENV = os.environ['PAYMENT_ENV']
 
 # Application definition
 INSTALLED_APPS = [
